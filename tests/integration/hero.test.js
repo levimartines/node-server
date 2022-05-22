@@ -41,7 +41,7 @@ test('Hero Integration Test Suite', async (t) => {
         await createHero(data)
     })
 
-    await t.test('Should return an error', async (t) => {
+    await t.test('Should return error', async (t) => {
         const hero = {
             name: '',
             age: null,
@@ -88,6 +88,21 @@ test('Hero Integration Test Suite', async (t) => {
 
         const resultKratos = result.find(hero => hero.id === kratos.id)
         assert.ok(resultKratos, 'Response should contain the saved Flash hero')
+    })
+
+    await t.test('Should update a hero', async (t) => {
+        const data = {
+            name: 'Batman',
+            age: 50,
+            power: 'rich'
+        }
+        let {id} = await createHero(data)
+        data.age = 55
+        const request = await fetch(testServerAddress + `/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        })
+        assert.strictEqual(request.status, 204, 'Should return 204')
     })
 
     await t.test('Should return the default route', async (t) => {

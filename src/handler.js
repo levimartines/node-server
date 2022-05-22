@@ -30,7 +30,7 @@ function handler(req, res) {
 
 function handlerError(res) {
     return error => {
-        console.log('Some error happened: ', error.stack)
+        console.error('Some error happened: ', error.stack)
         res.writeHead(500, DEFAULT_HEADER)
         res.write(JSON.stringify({
             error: error.message
