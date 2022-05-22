@@ -33,7 +33,7 @@ function handlerError(res) {
         console.log('Some error happened: ', error.stack)
         res.writeHead(500, DEFAULT_HEADER)
         res.write(JSON.stringify({
-            error: 'Internal server error'
+            error: error.message
         }))
         return res.end()
     }

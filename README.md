@@ -8,8 +8,6 @@ First of all, leave your star 🌟 on this repo.
 Access our [**exclusive telegram channel**](https://bit.ly/ErickWendelContentHub),
 so I'll let you know about all the content I've been producing
 
-## Source code of the examples showed in class
-- Access them in [examples-in-class/web-api](./examples-in-class/web-api)
 ## Features Checklist + Challenges
 
 - Web API
@@ -31,7 +29,7 @@ so I'll let you know about all the content I've been producing
         - [X] it should test the endpoint for retrieving heroes' data
         - [ ] it should test the endpoint for updating heroes' data
         - [ ] it should test the endpoint for deleting heroes' data
-        - [ ] it should test when the application throws an error
+        - [X] it should test when the application throws an error
 
 ### Notes
 - Should you have some difficulties solving the problems,

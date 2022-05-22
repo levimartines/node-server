@@ -10,12 +10,16 @@ test('Hero Integration Test Suite', async (t) => {
     const {server} = await import('../../src/index.js')
     const testServerAddress = `http://localhost:${testPort}/heroes`
 
+    async function postHero(hero) {
+        return await fetch(testServerAddress, {
+            method: 'POST',
+            body: JSON.stringify(hero)
+        })
+    }
+
     async function createHero({name, age, power}) {
         const data = {name, age, power};
-        const request = await fetch(testServerAddress, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        })
+        const request = await postHero(data)
         assert.deepStrictEqual(request.headers.get('content-type'), 'application/json', 'Should return a JSON')
         assert.strictEqual(request.status, 201, 'Should return 201')
 
@@ -35,6 +39,30 @@ test('Hero Integration Test Suite', async (t) => {
             power: 'rich'
         }
         await createHero(data)
+    })
+
+    await t.test('Should return an error', async (t) => {
+        const hero = {
+            name: '',
+            age: null,
+            power: ''
+        }
+        let request = await postHero(hero)
+        assert.deepStrictEqual(request.headers.get('content-type'), 'application/json', 'Should return a JSON')
+        assert.strictEqual(request.status, 500, 'Should return 500')
+
+        let body = await request.json()
+        assert.strictEqual(body.error, 'Hero name cannot be null or empty', 'Should return the respective error message')
+
+        hero.name = 'Spider Man'
+        request = await postHero(hero)
+        body = await request.json()
+        assert.strictEqual(body.error, 'Hero age cannot be null or less than 0', 'Should return the respective error message')
+
+        hero.age = 18
+        request = await postHero(hero)
+        body = await request.json()
+        assert.strictEqual(body.error, 'Hero power cannot be null or empty', 'Should return the respective error message')
     })
 
     await t.test('Should find all heroes', async (t) => {
@@ -60,6 +88,15 @@ test('Hero Integration Test Suite', async (t) => {
 
         const resultKratos = result.find(hero => hero.id === kratos.id)
         assert.ok(resultKratos, 'Response should contain the saved Flash hero')
+    })
+
+    await t.test('Should return the default route', async (t) => {
+        const request = await fetch(testServerAddress, {method: 'PATCH'})
+        assert.deepStrictEqual(request.headers.get('content-type'), 'application/json', 'Should return a JSON')
+        assert.strictEqual(request.status, 404, 'Should return 404 status')
+
+        const response = await request.text()
+        assert.equal(response, 'Oooooops! Not found!', 'Should return the default error message')
     })
 
     await promisify(server.close.bind(server))()
