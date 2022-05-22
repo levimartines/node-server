@@ -1,4 +1,4 @@
-const validate = ({name, age, power}) => {
+const validateCreate = ({name, age, power}) => {
     if (!name) {
         throw new Error('Hero name cannot be null or empty')
     }
@@ -10,6 +10,14 @@ const validate = ({name, age, power}) => {
     }
 }
 
+const validateUpdate = ({id, name, age, power}) => {
+    if (!id) {
+        throw new Error('Id cannot be null')
+    }
+    validateCreate({name, age, power})
+}
+
 export {
-    validate
+    validateCreate,
+    validateUpdate
 }

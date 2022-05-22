@@ -41,7 +41,7 @@ test('Hero Integration Test Suite', async (t) => {
         await createHero(data)
     })
 
-    await t.test('Should return error', async (t) => {
+    await t.test('Should validate hero creation', async (t) => {
         const hero = {
             name: '',
             age: null,
@@ -92,17 +92,38 @@ test('Hero Integration Test Suite', async (t) => {
 
     await t.test('Should update a hero', async (t) => {
         const data = {
-            name: 'Batman',
-            age: 50,
-            power: 'rich'
+            name: 'Aquaman',
+            age: 32,
+            power: 'talk with fishes'
         }
         let {id} = await createHero(data)
-        data.age = 55
-        const request = await fetch(testServerAddress + `/${id}`, {
+        data.id = id
+        data.age = 38
+        const request = await fetch(testServerAddress, {
             method: 'PUT',
             body: JSON.stringify(data)
         })
         assert.strictEqual(request.status, 204, 'Should return 204')
+    })
+
+    await t.test('Should validate hero update', async (t) => {
+        const data = {
+            name: 'Fallen',
+            age: 32,
+            power: 'CSGO god'
+        }
+        let request = await fetch(testServerAddress, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        })
+        assert.strictEqual(request.status, 500, 'Should return 500')
+
+        data.id = "aRandomUUID"
+        request = await fetch(testServerAddress, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        })
+        assert.strictEqual(request.status, 404, 'Should return 404')
     })
 
     await t.test('Should return the default route', async (t) => {
