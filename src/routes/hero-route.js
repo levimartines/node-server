@@ -30,6 +30,16 @@ const routes = ({heroService}) => ({
         res.writeHead(!id ? 404 : 204, DEFAULT_HEADER)
         return res.end()
     },
+    '/heroes:delete': async (req, res) => {
+        const data = String(await once(req, 'data'))
+        const {id} = JSON.parse(data)
+        if (!id) {
+            throw new Error('ID cannot be null')
+        }
+        const isDeleted = await heroService.delete(id)
+        res.writeHead(isDeleted ? 204 : 404, DEFAULT_HEADER)
+        return res.end()
+    },
 })
 
 export {

@@ -14,4 +14,8 @@ export default class HeroService {
     update(id, data) {
         return this.heroRepository.update(id, data)
     }
+
+    delete(id) {
+        return this.heroRepository.delete(id)
+    }
 }

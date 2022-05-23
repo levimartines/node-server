@@ -17,6 +17,12 @@ test('Hero Integration Test Suite', async (t) => {
         })
     }
 
+    async function findHeroes() {
+        const request = await fetch(testServerAddress, {method: 'GET'})
+        assert.strictEqual(request.status, 200, 'Should return 200')
+        return await request.json()
+    }
+
     async function createHero({name, age, power}) {
         const data = {name, age, power};
         const request = await postHero(data)
@@ -76,10 +82,8 @@ test('Hero Integration Test Suite', async (t) => {
             age: 38,
             power: 'God of War'
         })
-        const request = await fetch(testServerAddress, {method: 'GET'})
 
-        assert.strictEqual(request.status, 200, 'Should return 200')
-        const result = await request.json()
+        const result = await findHeroes()
 
         assert.ok(result.length > 2, 'Response should contain at least 2 heroes')
 
@@ -122,6 +126,45 @@ test('Hero Integration Test Suite', async (t) => {
         request = await fetch(testServerAddress, {
             method: 'PUT',
             body: JSON.stringify(data)
+        })
+        assert.strictEqual(request.status, 404, 'Should return 404')
+    })
+
+    await t.test('Should delete hero', async (t) => {
+        const hero = {
+            name: 'Goku',
+            age: 20,
+            power: 'Super Saiyagin'
+        }
+        let {id} = await createHero(hero)
+        hero.id = id
+
+        let request = await fetch(testServerAddress, {
+            method: 'DELETE',
+            body: JSON.stringify({id})
+        })
+        assert.strictEqual(request.status, 204, 'Should return 204 no content')
+
+        const heroes = await findHeroes()
+        const index = heroes.findIndex(h => h.id === id)
+        assert.ok(index === -1, 'Shoud not found the deleted Hero')
+    })
+
+    await t.test('Should validate payload to delete a hero', async (t) => {
+        let request = await fetch(testServerAddress, {
+            method: 'DELETE',
+            body: JSON.stringify({id: null})
+        })
+        assert.strictEqual(request.status, 500, 'Should return 500')
+
+        let body = await request.json()
+        assert.strictEqual(body.error, 'ID cannot be null', 'Should return the respective error message')
+    })
+
+    await t.test('Should not find hero to delete', async (t) => {
+        let request = await fetch(testServerAddress, {
+            method: 'DELETE',
+            body: JSON.stringify({id: 'aRandomUUID'})
         })
         assert.strictEqual(request.status, 404, 'Should return 404')
     })

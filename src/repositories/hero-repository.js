@@ -34,4 +34,15 @@ export default class HeroRepository {
         return hero.id
     }
 
+    async delete(id) {
+        const currentFile = await this.#currentFileContent()
+        const indexToDelete = currentFile.findIndex(hero => hero.id === id)
+        if (indexToDelete === -1) {
+            return false;
+        }
+        currentFile.splice(indexToDelete, 1)
+        await writeFile(this.filePath, JSON.stringify(currentFile))
+        return true
+    }
+
 }
